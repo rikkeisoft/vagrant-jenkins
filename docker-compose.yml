@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  sonarqube:
+    image: sonarqube
+    networks:
+      - sonar_internal
+    ports:
+        - 9000:9000
+    environment:
+        - SONARQUBE_JDBC_USERNAME=sonar
+        - SONARQUBE_JDBC_PASSWORD=sonar
+        - SONARQUBE_JDBC_URL=jdbc:postgresql://sonarqube_db:5432/sonar
+    links:
+        - sonarqube_db
+    volumes_from:
+        - sonarqube_datastore
+
+  sonarqube_db:
+    image: postgres
+    networks:
+      - sonar_internal
+    environment:
+        - POSTGRES_USER=sonar
+        - POSTGRES_PASSWORD=sonar
+    volumes_from:
+        - sonarqube_datastore
+
+  sonarqube_datastore:
+    build: ./datastore
+
+networks:
+  sonar_internal:
+    driver: bridge
+    
